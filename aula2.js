@@ -84,4 +84,30 @@ const moveisAcessiveisResumidos = pipe(
 
 console.log("\nProdutos de moveis que custam menos de 800 reais: ",moveisAcessiveisResumidos(vendas));
 
+const Maybe = (valor) => ({
+  map: (fn) =>
+    valor == null || (Array.isArray(valor) && valor.length === 0)
+      ? Maybe(null)
+      : Maybe(fn(valor)),
 
+  flatMap: (fn) =>
+    valor == null ? Maybe(null) : fn(valor),
+
+  getOrElse: (defaultValue) =>
+    valor == null ? defaultValue : valor
+});
+
+const pipeSeguro = (...fns) => (valorInicial) =>
+  fns.reduce(
+    (acc, fn) => acc.map(fn),
+    Maybe(valorInicial)
+  );
+
+const analiseSegura = pipeSeguro(
+  filtrarPorCategoria('inexistente'),
+  filtrarPorValorMinimo(500),
+  totalPorCategoria
+);
+
+const resul = analiseSegura(vendas).getOrElse('Nenhum resultado encontrado');
+console.log(resul);
