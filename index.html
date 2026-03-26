@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório de Vendas</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e7c6dc;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin: 20px auto;
+      width: 350px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #f15cff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #b622a2;
+    }
+
+    #resultado, #lista {
+      margin-top: 15px;
+      font-size: 18px;
+      color: #222;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Relatório de Vendas</h1>
+
+  <div class="card">
+    <h2>Faturamento de produtos Tech acima de R$ 500</h2>
+    <button onclick="calcularFaturamento()">Calcular</button>
+    <div id="resultado"></div>
+  </div>
+
+  <div class="card">
+    <h2>Top 3 acessórios mais baratos</h2>
+    <button onclick="mostrarTop3()">Mostrar</button>
+    <div id="lista"></div>
+  </div>
+
+  <script>
+        // ---------------- FUNÇÕES ----------------
+        const filtrarPorCategoria = (categoria) => (lista) =>
+        lista.filter(item => item.categoria === categoria);
+
+        const filtrarPorValorMinimo = (min) => (lista) =>
+        lista.filter(item => item.valor >= min);
+
+        const ordenarPorValor = (lista) =>
+        lista.toSorted((a, b) => a.valor - b.valor);
+
+        const totalGeral = (lista) =>
+        lista.reduce((soma, item) => soma + item.valor, 0);
+
+        const pegarPrimeiros = (n) => (lista) =>
+        lista.slice(0, n);
+
+        const pipe = (...fns) => (valorInicial) =>
+        fns.reduce((acc, fn) => fn(acc), valorInicial);
+
+        // ---------------- PIPELINES ----------------
+        const faturamentoTechAcima500 = pipe(
+        filtrarPorCategoria('tech'),
+        filtrarPorValorMinimo(500),
+        totalGeral
+        );
+
+        const top3MaisBaratos = pipe(
+        filtrarPorCategoria('acessórios'), 
+        ordenarPorValor,
+        pegarPrimeiros(3)
+        );
+
+        // ---------------- FUNÇÕES DE TELA ----------------
+        function calcularFaturamento() {
+            const div = document.getElementById("resultado");
+            const btn = document.getElementById("btnFaturamento");
+
+            if (div.innerHTML !== "") {
+                div.innerHTML = "";
+                btn.innerText = "Calcular";
+                return;
+            }
+
+            fetch('produtos.json')
+                .then(res => res.json())
+                .then(vendas => {
+                const resultado = faturamentoTechAcima500(vendas);
+
+                div.innerHTML = `<strong>R$ ${resultado}</strong>`;
+                btn.innerText = "Esconder";
+                });
+        }
+
+        function mostrarTop3() {
+            const div = document.getElementById("lista");
+            const btn = document.getElementById("btnTop3");
+
+            if (div.innerHTML !== "") {
+                div.innerHTML = "";
+                btn.innerText = "Mostrar";
+                return;
+            }
+
+            fetch('produtos.json')
+                .then(res => res.json())
+                .then(vendas => {
+                const lista = top3MaisBaratos(vendas);
+
+                div.innerHTML =
+            lista.map(p => `
+                <div class="item">
+                <strong>${p.produto}</strong><br>
+                <span class="categoria">${p.categoria}</span><br>
+                <span class="valor">R$ ${p.valor}</span>
+                </div>
+            `).join("");
+                });
+        }
+
+    </script>
+
+</body>
+</html>

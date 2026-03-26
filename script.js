@@ -39,7 +39,7 @@ const totalPorCategoria = (lista) =>
     [item.categoria]: (acc[item.categoria] || 0) + item.valor
   }), {});
 
-  console.log("\nTotal por Categoria: " , totalPorCategoria(vendas))
+console.log("\nTotal por Categoria: " , totalPorCategoria(vendas))
 
 //Valor total produtos
 const totalProdutos = vendas.reduce((acc, p) => acc + p.valor, 0);
@@ -76,7 +76,7 @@ console.assert(filtrarPorCategoria('roupas')([]).length === 0,'Lista vazia retor
 console.assert(filtrarPorCategoria('móveis')([{produto:'Pc', valor:100, categoria:'tech'}]).length === 0,'Lista com 0 item da categoria móveis');
 
 
-// --- Funções de transformação ---
+// Funções de transformação 
 
 // resumir
 const resumo = resumir(vendas);
@@ -94,7 +94,7 @@ console.assert(resumo !== vendas,'Resumo é um novo array, não altera original'
 console.assert(resumo[0] !== vendas[0],'Cada objeto do resumo é novo, não é o mesmo do original');
 
 
-// --- Funções de agregação ---
+// Funções de agregação 
 
 // totalPorCategoria
 const total = totalPorCategoria(vendas);
@@ -104,14 +104,13 @@ console.assert(total['móveis'] === 2950,'Total móveis deve ser 1200 + 1500 + 2
 console.assert(typeof total === 'object','Total deve retornar um objeto');
 
 
-// --- Funções de ordenação ---
+// Funções de ordenação 
 
 // ordenarPorValor
 const ordenado = ordenarPorValor(vendas);
 console.assert(ordenado[0].valor === 45,'Primeiro item ordenado deve ser o menor valor');
 console.assert(ordenado[ordenado.length - 1].valor === 4500,'Último item ordenado deve ser o maior valor');
 
-// Checa que retorna novo array
 console.assert(ordenado !== vendas,'Ordenação retorna novo array, não altera original');
 
 console.assert( ordenarPorValor([]).length === 0,'Lista vazia deve retornar vazia');
